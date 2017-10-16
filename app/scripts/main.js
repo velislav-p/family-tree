@@ -71,10 +71,13 @@
       console.error('Error during service worker registration:', e);
     });
   }
+    //************************************** CLASS DECLARATION ********************************************//
     class Person {
-        constructor(height, width){
-            this.height = height;
-            this.width = width;
+        constructor(top, left, img){
+            this.top = top;
+            this.left = left;
+            this.id = guid();
+            this.img = img;
         }
     }
 
@@ -82,33 +85,123 @@
 
     class Child extends Person {
 
-        constructor(age, height, width){
-            super(height, width);
+        constructor(age, top, left){
+            super(top, left);
             this.age = age;
         }
     }
     const Hakan = new Child(40, 30, 20);
-    console.log(Hakan.age);
-    console.log(Hakan.height);
-    console.log(Hakan.width);
+    const familyRoot = new Person(800,500,"me.png");
+
+
+
+    //************************************** GLOBAL DECLARATIONS ********************************************//
+
+    var aFamily=[];
+
+    var initiatorObject = "";
+    var initiatorHtml = "";
+  //************************************** DISPLAYING THE DATA ********************************************//
+    function gridInit(){
+        var canvasWrapper = $(".canvas-wrapper");
+        var maxElements = canvasWrapper.width()*canvasWrapper.height()/200*100;
+        for (var i=0; i<54; i++){
+            $(".grid").append("<div class='grid-cell'></div>")
+        }
+    }
+    gridInit();
+
+    if(!localStorage.getItem("arrayFamily")){
+        aFamily.push(familyRoot);
+        localStorage.setItem("arrayFamily",JSON.stringify(aFamily));
+    }else {
+    var sFamily = localStorage.getItem("arrayFamily");
+
+    aFamily = JSON.parse(sFamily);
+    }
+
+    aFamily.forEach(function(jPerson){
+        console.log(jPerson);
+        var person = $.parseHTML("<div id='"+jPerson.id+"' class='element-wrapper'><button class='plus top'>+</button><button class='plus bottom'>+</button><button class='plus left'>+</button><button class='plus right'>+</button><div><img src='images/"+jPerson.img+"'></div></div>");
+        $(".canvas-overlay").prepend($(person));
+        $(person).css({top:jPerson.top, left:jPerson.left});
+    });
+
+    console.log(aFamily);
+
+
+    //************************************** GLOBAL OBJECTS AND ARRAYS ********************************************//
+
+    //************************************** HANDLING THE ADD PERSON FORM ********************************************//
+
+    $(".add").click(function(){
+        var wrapperElement = $(this).closest("div .wrapper");
+        var relation = wrapperElement.find($("select")).val();
+        switch(relation){
+            case "father":
+                console.log("case father");
+                addParent(initiatorHtml,"father");
+                break;
+            case "mother":
+                console.log("case mother");
+                addParent(initiatorHtml,"mother");
+                break;
+            case "brother":
+                console.log("case brother");
+                break;
+            case "sister":
+                console.log("case sister");
+                break;
+            case "son":
+                console.log("case son");
+                break;
+            case "daughter":
+                console.log("case daughter");
+                break;
+            default:
+                console.log("default");
+        }
+    });
+
+    //************************************** FUNCTIONS ********************************************//
+    function findObjectInMemory(id){
+        var object;
+        aFamily.forEach(function(jPerson){
+            if(jPerson.id == id){
+                return object = jPerson;
+            }
+        });
+        return object;
+    }
 
     $(document).on("click",".top",function(){
-        console.log("parent created");
-        addParent($(this).closest("div .element-wrapper"));
+        console.log("parent");
+        $(".hide").hide();
+        $(".selectParent").show();
+        initiatorHtml = $(this).closest(".element-wrapper");
+        console.log(initiatorHtml[0]);
+        var id = $(initiatorHtml).attr("id");
+        initiatorObject = findObjectInMemory(id);
+        console.log(initiatorObject);
+
     });
 
 
     $(".left").on("click",function(){
-      console.log("spouse created");
+      console.log("spouse");
 
 
     });
+
     $(".right").on("click",function(){
-        console.log("spouse created");
+        console.log("spouse");
 
     });
-    $(".bottom").on("click",function(){
-        console.log("child created");
+    $(document).on("click",".bottom",function(){
+        console.log("child");
+        $(".hide").hide();
+        $(".selectChild").show();
+        addChild($(this).closest("div .element-wrapper"));
 
     });
 
@@ -119,15 +212,89 @@
         }
     }
 
-   function addParent(origin){
-      console.log(origin.offset());
+    function checkCoords(top, left){
+        var result= true;
+        aFamily.forEach(function(jPerson){
+            if(jPerson.top == top && jPerson.left == left){
+                result = false;
+                return result;
+            }
+        });
+        return result;
+    }
+    function offsetRow(top,left){
+        aFamily.forEach(function(jPerson){
+            if(jPerson.top == top){
+                jPerson.left+=200;
+                location.reload();
+            }
+        })
+    }
+   function addParent(origin, relation){
+      //console.log(origin.offset());
       var originPosition = origin.position();
       console.log(originPosition.left);
       console.log(originPosition.top);
-      var child = $.parseHTML("<div class='element-wrapper'><button class='plus top'>+</button><button class='plus bottom'>+</button><button class='plus left'>+</button><button class='plus right'>+</button><div><img src='images/Chil 2017-10-11 Rigsarkivet_Stamtrae_LTF_Fall17_v5 pdf.png'></div></div>");
-      $(".canvas-overlay").prepend($(child));
-      $(child).css({top:originPosition.top-100, left:originPosition.left+100});
+      var parent;
+      var offsetPosition = {"top":0,"left":0};
+      offsetPosition.top =  originPosition.top-100;
+      var img;
+      if(relation=="father"){
+          if(initiatorObject.img == "father.png"){
+              $.each(aFamily,function(){
+                  if(this.id == initiatorObject.id){
+                      this.left = this.left+100;
+                  }
+              })
+          }
+          img = "father.png";
+          parent = $.parseHTML("<div class='element-wrapper'><button class='plus top'>+</button><button class='plus bottom'>+</button><button class='plus left'>+</button><button class='plus right'>+</button><div><img src='images/"+img+"'></div></div>");
+          var coords = checkCoords(originPosition.top-100, originPosition.left+100);
+          if(coords){
+              offsetPosition.left = originPosition.left+100;
+          }else {
 
+              offsetPosition.left = originPosition.left+100;
+              offsetRow(originPosition.top-100,originPosition.left+100);
+          }
+      }else {
+          if(initiatorObject.img == "mother.png"){
+              $.each(aFamily,function(){
+                  if(this.id == initiatorObject.id){
+                      this.left = this.left-100;
+                  }
+              })
+          }
+          img = "mother.png";
+          parent = $.parseHTML("<div class='element-wrapper'><button class='plus top'>+</button><button class='plus bottom'>+</button><button class='plus left'>+</button><button class='plus right'>+</button><div><img src='images/"+img+"'></div></div>");
+          offsetPosition.left = originPosition.left-100;
+      }
+      $(".canvas-overlay").prepend($(parent));
+
+      const oParent = new Person(offsetPosition.top,offsetPosition.left,img);
+      $(parent).css({top:offsetPosition.top, left:offsetPosition.left}).attr("id",oParent.id);
+      aFamily.push(oParent);
+      localStorage.setItem("arrayFamily", JSON.stringify(aFamily));
+      console.log(aFamily);
 
    }
+    function addChild(origin){
+        console.log(origin.offset());
+        var originPosition = origin.position();
+        console.log(originPosition.left);
+        console.log(originPosition.top);
+        var child = $.parseHTML("<div class='element-wrapper'><button class='plus top'>+</button><button class='plus bottom'>+</button><button class='plus left'>+</button><button class='plus right'>+</button><div><img src='images/me.png'></div></div>");
+        $(".canvas-overlay").prepend($(child));
+        $(child).css({top:originPosition.top+100, left:originPosition.left+100});
+    }
+
+    function guid() {
+        function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1);
+        }
+        return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+            s4() + '-' + s4() + s4() + s4();
+    }
 })();

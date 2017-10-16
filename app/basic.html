@@ -38,17 +38,46 @@
     -->
   </head>
   <body>
+  <div>
+    <div class="wrapper selectParent hide">
+    <label for="selectParent">Parent</label>
+    <select id="selectParent" class="selectParent">
+      <option value="father">Father</option>
+      <option value="mother">Mother</option>
+    </select>
+      <button class="add addParent">Add parent</button>
+    </div>
+    <div class="wrapper selectSiblingOrPartner hide">
+    <label for="selectSiblingOrPartner">Partner or Sibling</label>
+    <select id="selectSiblingOrPartner" class="selectSiblingOrPartner">
+      <option value="brother">Brother</option>
+      <option value="sister">Sister</option>
+      <option value="husband">Husband</option>
+      <option value="wife">Wife</option>
+    </select>
+      <button class="add addSiblingOrPartner">Add spouse</button>
+    </div>
+    <div class="wrapper selectChild hide">
+    <label for="selectChild">Child</label>
+    <select id="selectChild" class="selectChild">
+      <option value="son">Son</option>
+      <option value="daughter">Daughter</option>
+    </select>
+      <button class="add addChild">Add child</button>
+    </div>
 
+  </div>
   <div class="canvas-wrapper">
     <div class="canvas-overlay">
-    <div class="element-wrapper initial">
-      <button class="plus top">+</button>
-      <button class="plus bottom">+</button>
-      <button class="plus left">+</button>
-      <button class="plus right">+</button>
-      <div><img src="images/Screenshot-2017-10-11 Rigsarkivet_Stamtrae_LTF_Fall17_v5 pdf.png"></div>
+    <!--<div class="element-wrapper initial">-->
+      <!--<button class="plus top">+</button>-->
+      <!--<button class="plus bottom">+</button>-->
+      <!--<button class="plus left">+</button>-->
+      <!--<button class="plus right">+</button>-->
+      <!--<div><img src="images/me.png"></div>-->
+    <!--</div>-->
     </div>
-    </div>
+
   <canvas id="canvas" width="1200px" height="900px"></canvas>
   </div>
 
