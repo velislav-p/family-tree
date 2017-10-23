@@ -217,6 +217,10 @@ html, body {
 *{
   box-sizing:border-box;
 }
+label{
+  color:white;
+  margin-left:100px;
+}
 body{
   background-color:#263238;
   display:flex;
@@ -232,14 +236,14 @@ canvas{
   z-index:0;
 }
 .canvas-wrapper{
-  width:1200px;
+  width:2400px;
   height:900px;
   position:relative;
   background-color:palegreen;
 }
 .canvas-overlay{
   position:relative;
-  width:1200px;
+  width:2400px;
   height:900px;
   z-index:10;
 }
@@ -263,7 +267,7 @@ canvas{
   max-width:135px;
 }
 .grid{
-  width:1200px;
+  width:2400px;
   height:900px;
   position:absolute;
   top:0;

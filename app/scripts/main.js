@@ -73,7 +73,7 @@
     }
     //************************************** CLASS DECLARATION ********************************************//
     class Person {
-        constructor(top, left, img, oId, gen){
+        constructor(top, left, img, oId, gen, oRelation){
             this.top = top;
             this.left = left;
             this.id = guid();
@@ -84,6 +84,7 @@
             }else {
                 this.originid = oId;
             }
+            this.oRelation = oRelation;
         }
     }
 
@@ -97,16 +98,19 @@
         }
     }
     const Hakan = new Child(40, 30, 20);
-    const familyRoot = new Person(800,500,"me.png",null,1);
+    var middleOfCanvas = getMiddle();
+    console.log(middleOfCanvas);
+    const familyRoot = new Person(800,middleOfCanvas-100,"me.png",null,1,"origin");
 
 
 
     //************************************** GLOBAL DECLARATIONS ********************************************//
 
     var aFamily=[];
-
     var initiatorObject = "";
     var initiatorHtml = "";
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
     //************************************** DISPLAYING THE DATA ********************************************//
 
     if(!localStorage.getItem("arrayFamily")){
@@ -117,15 +121,68 @@
 
         aFamily = JSON.parse(sFamily);
     }
-
+    var dropdownParent = $("#selectExistingParent");
+    var dropdownPartner = $("#selectExistingSiblingOrPartner");
+    var dropdownChild = $("#selectExistingChild");
     aFamily.forEach(function(jPerson){
 
         var person = $.parseHTML("<div id='"+jPerson.id+"' class='element-wrapper' data-originid='"+jPerson.originid+"'><button class='plus top'>+</button><button class='plus bottom'>+</button><button class='plus left'>+</button><button class='plus right'>+</button><div><img src='images/"+jPerson.img+"'></div></div>");
         $(".canvas-overlay").prepend($(person));
         $(person).css({top:jPerson.top, left:jPerson.left});
+        switch(jPerson.oRelation){
+            case "father":
+                dropdownParent.append("<option id ='"+jPerson.id+"'>"+jPerson.id+"</option>");
+                aFamily.forEach(function(object){
+                    if (object.id == jPerson.originid){
+                        drawLineDownwards({"top":jPerson.top,"left":jPerson.left},{"top":object.top,"left":object.left});
+                    }
+                });
+                break;
+            case "mother":
+                dropdownParent.append("<option id ='"+jPerson.id+"'>"+jPerson.id+"</option>");
+                aFamily.forEach(function(object){
+                    if (object.id == jPerson.originid){
+                        drawLineDownwards({"top":jPerson.top,"left":jPerson.left},{"top":object.top,"left":object.left});
+                    }
+                });
+                break;
+            case "husband":
+                dropdownPartner.append("<option id ='"+jPerson.id+"'>"+jPerson.id+"</option>");
+                dropdownParent.append("<option id ='"+jPerson.id+"'>"+jPerson.id+"</option>");
+                aFamily.forEach(function(object){
+                    if (object.id == jPerson.originid){
+                        drawLineAcross({"top":jPerson.top,"left":jPerson.left},{"top":object.top,"left":object.left});
+                    }
+                });
+                break;
+            case "wife":
+                dropdownPartner.append("<option id ='"+jPerson.id+"'>"+jPerson.id+"</option>");
+                dropdownParent.append("<option id ='"+jPerson.id+"'>"+jPerson.id+"</option>");
+                aFamily.forEach(function(object){
+                    if (object.id == jPerson.originid){
+                        drawLineAcross({"top":jPerson.top,"left":jPerson.left},{"top":object.top,"left":object.left});
+                    }
+                });
+                break;
+            case "son":
+                dropdownChild.append("<option id ='"+jPerson.id+"'>"+jPerson.id+"</option>");
+                aFamily.forEach(function(object){
+                    if (object.id == jPerson.originid){
+                        drawLineUpwards({"top":jPerson.top,"left":jPerson.left},{"top":object.top,"left":object.left});
+                    }
+                });
+                break;
+            case "daughter":
+                dropdownChild.append("<option id ='"+jPerson.id+"'>"+jPerson.id+"</option>");
+                aFamily.forEach(function(object){
+                    if (object.id == jPerson.originid){
+                        drawLineUpwards({"top":jPerson.top,"left":jPerson.left},{"top":object.top,"left":object.left});
+                    }
+                });
+                break;
+        }
     });
-
-
+    console.log(aFamily);
 
 
     //************************************** GLOBAL OBJECTS AND ARRAYS ********************************************//
@@ -143,21 +200,45 @@
                 console.log("case mother");
                 addParent(initiatorHtml,"mother",initiatorObject);
                 break;
-            case "brother":
-                console.log("case brother");
+            case "husband":
+                addPartner(initiatorHtml,"husband",initiatorObject);
                 break;
-            case "sister":
-                console.log("case sister");
+            case "wife":
+                addPartner(initiatorHtml,"wife",initiatorObject);
                 break;
             case "son":
-                console.log("case son");
+                addChild(initiatorHtml,"son",initiatorObject);
                 break;
             case "daughter":
-                console.log("case daughter");
+                addChild(initiatorHtml,"daughter",initiatorObject);
                 break;
             default:
                 console.log("default");
         }
+    });
+
+    $(".addExistingParent").click(function(){
+        var wrapperElement =  $(this).closest("div .wrapper");
+        var sExistingPersonId = wrapperElement.find($("#selectExistingParent")).val();
+        var oExistingPerson = findObjectInMemory(sExistingPersonId);
+        console.log(oExistingPerson,initiatorObject);
+        drawLineUpwards(initiatorObject,oExistingPerson);
+
+    });
+    $(".addExistingSiblingOrPartner").click(function(){
+        var wrapperElement = $(this).closest("div .wrapper");
+        var sExistingPersonId = wrapperElement.find($("#selectExistingSiblingOrPartner")).val();
+        var oExistingPerson = findObjectInMemory(sExistingPersonId);
+        drawLineAcross(initiatorObject,oExistingPerson);
+
+
+    });
+    $(".addExistingChild").click(function(){
+        var wrapperElement = $(this).closest("div .wrapper");
+        var sExistingPersonId = wrapperElement.find($("#selectExistingChild")).val();
+        var oExistingPerson = findObjectInMemory(sExistingPersonId);
+        drawLineDownwards(initiatorObject,oExistingPerson);
+
     });
 
     //************************************** FUNCTIONS ********************************************//
@@ -180,31 +261,38 @@
         var id = $(initiatorHtml).attr("id");
         initiatorObject = findObjectInMemory(id);
 
+    });
+
+    $(document).on("click",".left",function(){
+        $(".hide").hide();
+        $(".selectSiblingOrPartner").show();
+        initiatorHtml = $(this).closest(".element-wrapper");
+
+        var id = $(initiatorHtml).attr("id");
+        initiatorObject = findObjectInMemory(id);
 
     });
 
-    $(".left").on("click",function(){
-        console.log("spouse");
-    });
+    $(document).on("click",".right",function(){
+        $(".hide").hide();
+        $(".selectSiblingOrPartner").show();
+        initiatorHtml = $(this).closest(".element-wrapper");
 
-    $(".right").on("click",function(){
-        console.log("spouse");
+        var id = $(initiatorHtml).attr("id");
+        initiatorObject = findObjectInMemory(id);
+
 
     });
     $(document).on("click",".bottom",function(){
-        console.log("child");
         $(".hide").hide();
         $(".selectChild").show();
-        addChild($(this).closest("div .element-wrapper"));
+        initiatorHtml = $(this).closest(".element-wrapper");
+
+        var id = $(initiatorHtml).attr("id");
+        initiatorObject = findObjectInMemory(id);
+
 
     });
-
-    function draw() {
-        var canvas = document.getElementById('canvas');
-        if (canvas.getContext) {
-            var ctx = canvas.getContext('2d');
-        }
-    }
 
     function getCoords(top, left){
         var result= true;
@@ -228,9 +316,9 @@
         var originPosition = originHtml.position();
         var parent;
         var offsetPosition = {"top":0,"left":0};
-        offsetPosition.top =  originPosition.top-100;
+        offsetPosition.top =  originPosition.top-150;
         var img;
-        var outerElement = getOuterElement(originPosition.top-100,originObj.id);
+        var outerElement = getOuterElement(originPosition.top-150,originObj.id);
         console.log(outerElement);
         if(relation=="father"){
             img = "father.png";
@@ -239,23 +327,23 @@
             switch(originObj.gen) {
                 case 1:
                     if(outerElement.last===false){
-                        offsetPosition.left = originPosition.left+200;
+                        offsetPosition.left = originPosition.left+250;
                     }else {
-                        offsetPosition.left = outerElement.last+400;
+                        offsetPosition.left = outerElement.last+500;
                     }
                     break;
                 case 2:
                     if(outerElement.last===false){
-                        offsetPosition.left = originPosition.left+100;
+                        offsetPosition.left = originPosition.left+125;
                     }else {
-                        offsetPosition.left = outerElement.last+200;
+                        offsetPosition.left = outerElement.last+250;
                     }
                     break;
                 default:
                     if(outerElement.last===false){
-                        offsetPosition.left = originPosition.left+100;
+                        offsetPosition.left = originPosition.left+125;
                     }else {
-                        offsetPosition.left = outerElement.last+200;
+                        offsetPosition.left = outerElement.last+250;
                     }
                     break;
             }
@@ -265,23 +353,24 @@
             switch(originObj.gen) {
                 case 1:
                     if(outerElement.first===false){
-                        offsetPosition.left = originPosition.left-200;
+                        offsetPosition.left = originPosition.left-250;
+
                     }else {
-                        offsetPosition.left = outerElement.first-400;
+                        offsetPosition.left = outerElement.first-500;
                     }
                     break;
                 case 2:
                     if(outerElement.first===false){
-                        offsetPosition.left = originPosition.left-100;
+                        offsetPosition.left = originPosition.left-125;
                     }else {
-                        offsetPosition.left = outerElement.first-200;
+                        offsetPosition.left = outerElement.first-250;
                     }
                     break;
                 default:
                     if(outerElement.first===false){
-                        offsetPosition.left = originPosition.left-100;
+                        offsetPosition.left = originPosition.left-125;
                     }else {
-                        offsetPosition.left = outerElement.first-200;
+                        offsetPosition.left = outerElement.first-250;
                     }
                     break;
             }
@@ -289,31 +378,88 @@
         }
         $(".canvas-overlay").prepend($(parent));
 
-        const oParent = new Person(offsetPosition.top,offsetPosition.left,img,initiatorObject.id,initiatorObject.gen+1);
+        const oParent = new Person(offsetPosition.top,offsetPosition.left,img,initiatorObject.id,initiatorObject.gen+1,relation);
         $(parent).css({top:offsetPosition.top, left:offsetPosition.left}).attr("id",oParent.id);
         $(parent).attr("data-originid",initiatorObject.id);
+        drawLineUpwards(originPosition,offsetPosition);
+
         aFamily.push(oParent);
         localStorage.setItem("arrayFamily", JSON.stringify(aFamily));
 
-
-
     }
-    function addChild(origin){
+    function addPartner(originHtml, relation, originObj){
+        var originPosition = originHtml.position();
+        var partner;
+        var offsetPosition = {"top":0,"left":0};
+        offsetPosition.top =  originPosition.top;
+        var originRelativePosition = getMiddle(originPosition);
+        var img;
+        if(relation === "husband"){
+            img = "father.png";
+        }else {
+            img = "mother.png";
+        }
+        if(originRelativePosition === "right"){
 
-        var originPosition = origin.position();
+            partner = $.parseHTML("<div class='element-wrapper'><button class='plus top'>+</button><button class='plus bottom'>+</button><button class='plus left'>+</button><button class='plus right'>+</button><div><img src='images/"+img+"'></div></div>");
+            offsetPosition.left = originPosition.left+250;
 
-        var child = $.parseHTML("<div class='element-wrapper'><button class='plus top'>+</button><button class='plus bottom'>+</button><button class='plus left'>+</button><button class='plus right'>+</button><div><img src='images/me.png'></div></div>");
+        }else {
+
+            partner = $.parseHTML("<div class='element-wrapper'><button class='plus top'>+</button><button class='plus bottom'>+</button><button class='plus left'>+</button><button class='plus right'>+</button><div><img src='images/"+img+"'></div></div>");
+            offsetPosition.left = originPosition.left-250;
+
+        }
+        $(".canvas-overlay").prepend($(partner));
+
+        const oPartner = new Person(offsetPosition.top,offsetPosition.left,img,initiatorObject.id,initiatorObject.gen,relation);
+        $(partner).css({top:offsetPosition.top, left:offsetPosition.left}).attr("id",oPartner.id);
+        $(partner).attr("data-originid",initiatorObject.id);
+        drawLineAcross(originPosition,offsetPosition);
+        aFamily.push(oPartner);
+        localStorage.setItem("arrayFamily", JSON.stringify(aFamily));
+    }
+
+    function addChild(originHtml, relation,originObj){
+        var originPosition = originHtml.position();
+        var img = "me.png";
+        var offsetPosition = {"top":0,"left":0};
+        offsetPosition.top =  originPosition.top+150;
+        var outerElement = getOuterElement(originPosition.top+150,originObj.id, originObj.originid);
+        var originRelativePosition = getMiddle(originPosition);
+        console.log(originRelativePosition);
+        var child;
+        child = $.parseHTML("<div class='element-wrapper'><button class='plus top'>+</button><button class='plus bottom'>+</button><button class='plus left'>+</button><button class='plus right'>+</button><div><img src='images/"+img+"'></div></div>");
+
+        if(originRelativePosition === "left"){
+            if(outerElement.first===false){
+                offsetPosition.left = originPosition.left;
+            }else {
+                offsetPosition.left = outerElement.first-250;
+            }
+        }else {
+            if(outerElement.last===false){
+                offsetPosition.left = originPosition.left;
+            }else {
+                offsetPosition.left = outerElement.last+250;
+            }
+        }
+        const oChild = new Person(offsetPosition.top,offsetPosition.left,img,initiatorObject.id,initiatorObject.gen-1,relation);
         $(".canvas-overlay").prepend($(child));
-        $(child).css({top:originPosition.top+100, left:originPosition.left+100});
+        $(child).css({top:offsetPosition.top, left:offsetPosition.left}).attr("id",oChild.id);
+        $(child).attr("data-originid",initiatorObject.id);
+        drawLineDownwards(originPosition,offsetPosition);
+        aFamily.push(oChild);
+        localStorage.setItem("arrayFamily", JSON.stringify(aFamily));
     }
     //functionality for finding the right-most and left-most elements in the canvas. Needs to be modified to search by row.
-    function getOuterElement(top,originId){
+    function getOuterElement(top,initiatorId, originId){
         var lowest = Number.POSITIVE_INFINITY;
         var highest = Number.NEGATIVE_INFINITY;
         var tmp;
         var row = top;
         for (var i=aFamily.length-1; i>=0; i--) {
-            if(aFamily[i].top == top && aFamily[i].originid==originId){
+            if(aFamily[i].top == top && (aFamily[i].originid==initiatorId || aFamily[i].id==originId)){
                 tmp = aFamily[i].left;
                 if (tmp < lowest) lowest = tmp;
                 if (tmp > highest) highest = tmp;
@@ -326,12 +472,22 @@
             highest = false;
         }
         return {"first":lowest,"last":highest,"row":row};
-
     }
 
-    function getMiddle(){
+    function getMiddle(originPosition = false){
+        var position;
         var middle = ($(".canvas-overlay").width())/2;
-        return middle;
+        if(originPosition.left - middle >= 0){
+            position = "right";
+        }else {
+            position = "left";
+        }
+        if(originPosition){
+            return position;
+        }else {
+            return middle;
+        }
+
     }
 
     function shiftFromMiddle(top){
@@ -366,22 +522,109 @@
         localStorage.clear();
         location.reload();
     });
-    $('.element-wrapper').fadeTo(1,0.5);
+    $('.element-wrapper').fadeTo(1,0.1);
     $(document).on("mouseenter",".element-wrapper",function(){
         var elementId = this.id;
         var originId = this.dataset.originid;
         $(this).fadeTo(150,1);
         $('[data-originid='+elementId+']').fadeTo(1,1);
         $('#'+originId+'').fadeTo(1,1);
+        var thisElement = aFamily.filter(function(object){
+           return object.id === elementId;
+        });
+        console.log(thisElement[0]);
+        aFamily.forEach(function(jPerson){
+            if(jPerson.originid === elementId){
+                drawLineDownwards(jPerson, thisElement[0],1);
 
-
+            }
+        })
     }).on("mouseleave",".element-wrapper",function(){
         var elementId = this.id;
         var originId = this.dataset.originid;
         $(this).fadeTo(150,0.5);
-        $('[data-originid='+elementId+']').fadeTo(1,0.5);
-        $('#'+originId+'').fadeTo(1,0.5);
+        $('[data-originid='+elementId+']').fadeTo(1,0.1);
+        $('#'+originId+'').fadeTo(1,0.1);
+        var thisElement = aFamily.filter(function(object){
+            return object.id === elementId;
+        });
+        console.log(thisElement[0]);
+        var aOuterDescendants = [];
+        aFamily.forEach(function(jPerson){
+            if(jPerson.originid === elementId){
+                aOuterDescendants.push(jPerson);
+            }
+        });
+
+        var lowest = Number.POSITIVE_INFINITY;
+        var lowestHeight;
+        var highest = Number.NEGATIVE_INFINITY;
+        var highestHeight;
+        var tmp;
+        for (var i=aOuterDescendants.length-1; i>=0; i--) {
+            tmp = aOuterDescendants[i].left;
+            if (tmp < lowest){
+                lowest = tmp;
+                lowestHeight = aOuterDescendants[i].top;
+            }
+            if (tmp > highest){
+                highest = tmp;
+                highestHeight = aOuterDescendants[i].top;
+            }
+        }
+        console.log(lowest,highest);
+        ctx.clearRect(lowest, lowestHeight, highest, highestHeight);
     });
 
+    /************************************************************* DRAWING FUNCTIONS *******************************************/
+    function drawLineUpwards(origin,destination) {
 
+        if (canvas.getContext) {
+
+            var originObjectCenter = {"left":origin.left+100,"top":origin.top+50};
+            var destinationObjectCenter = {"left":destination.left+100,"top":destination.top+50};
+
+            ctx.beginPath();
+            ctx.moveTo(originObjectCenter.left, originObjectCenter.top);
+            ctx.lineTo(originObjectCenter.left, originObjectCenter.top-75);
+            ctx.lineTo(destinationObjectCenter.left, destinationObjectCenter.top+75);
+            ctx.lineTo(destinationObjectCenter.left, destinationObjectCenter.top);
+            ctx.strokeStyle = "rgba(0,0,0,0.1)";
+            ctx.stroke();
+
+        }
+    }
+    function drawLineDownwards(origin,destination,opacity = 0.1) {
+
+        if (canvas.getContext) {
+
+            var originObjectCenter = {"left":origin.left+100,"top":origin.top+50};
+            var destinationObjectCenter = {"left":destination.left+100,"top":destination.top+50};
+
+            ctx.beginPath();
+            ctx.moveTo(originObjectCenter.left, originObjectCenter.top);
+            ctx.lineTo(originObjectCenter.left, originObjectCenter.top+75);
+            ctx.lineTo(destinationObjectCenter.left, destinationObjectCenter.top-75);
+            ctx.lineTo(destinationObjectCenter.left, destinationObjectCenter.top);
+            ctx.strokeStyle = "rgba(0,0,0,"+opacity+")";
+            ctx.stroke();
+        }
+    }
+
+    function drawLineAcross(origin,destination) {
+
+        if (canvas.getContext) {
+
+            var originObjectCenter = {"left":origin.left+100,"top":origin.top+50};
+            var destinationObjectCenter = {"left":destination.left+100,"top":destination.top+50};
+
+            ctx.beginPath();
+            ctx.moveTo(originObjectCenter.left, originObjectCenter.top);
+            ctx.lineTo(originObjectCenter.left, originObjectCenter.top+75);
+            ctx.lineTo(destinationObjectCenter.left, destinationObjectCenter.top+75);
+            ctx.lineTo(destinationObjectCenter.left, destinationObjectCenter.top);
+            ctx.strokeStyle = "rgba(0,0,0,0.1)";
+            ctx.stroke();
+        }
+    }
 })();
