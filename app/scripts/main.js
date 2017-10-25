@@ -110,7 +110,10 @@
     var initiatorObject = "";
     var initiatorHtml = "";
     var canvas = document.getElementById('canvas');
-    var ctx = canvas.getContext('2d');
+    console.log(canvas);
+    var canvasSecondary = document.getElementById('canvas-secondary');
+
+
     //************************************** DISPLAYING THE DATA ********************************************//
 
     if(!localStorage.getItem("arrayFamily")){
@@ -121,9 +124,9 @@
 
         aFamily = JSON.parse(sFamily);
     }
-    var dropdownParent = $("#selectExistingParent");
-    var dropdownPartner = $("#selectExistingSiblingOrPartner");
-    var dropdownChild = $("#selectExistingChild");
+    // var dropdownParent = $("#selectExistingParent");
+    // var dropdownPartner = $("#selectExistingSiblingOrPartner");
+    // var dropdownChild = $("#selectExistingChild");
     aFamily.forEach(function(jPerson){
 
         var person = $.parseHTML("<div id='"+jPerson.id+"' class='element-wrapper' data-originid='"+jPerson.originid+"'><button class='plus top'>+</button><button class='plus bottom'>+</button><button class='plus left'>+</button><button class='plus right'>+</button><div><img src='images/"+jPerson.img+"'></div></div>");
@@ -134,7 +137,7 @@
                 dropdownParent.append("<option id ='"+jPerson.id+"'>"+jPerson.id+"</option>");
                 aFamily.forEach(function(object){
                     if (object.id == jPerson.originid){
-                        drawLineDownwards({"top":jPerson.top,"left":jPerson.left},{"top":object.top,"left":object.left});
+                        drawLineDownwards({"top":jPerson.top,"left":jPerson.left},{"top":object.top,"left":object.left},0.1,canvas);
                     }
                 });
                 break;
@@ -142,7 +145,7 @@
                 dropdownParent.append("<option id ='"+jPerson.id+"'>"+jPerson.id+"</option>");
                 aFamily.forEach(function(object){
                     if (object.id == jPerson.originid){
-                        drawLineDownwards({"top":jPerson.top,"left":jPerson.left},{"top":object.top,"left":object.left});
+                        drawLineDownwards({"top":jPerson.top,"left":jPerson.left},{"top":object.top,"left":object.left},0.1,canvas);
                     }
                 });
                 break;
@@ -151,7 +154,7 @@
                 dropdownParent.append("<option id ='"+jPerson.id+"'>"+jPerson.id+"</option>");
                 aFamily.forEach(function(object){
                     if (object.id == jPerson.originid){
-                        drawLineAcross({"top":jPerson.top,"left":jPerson.left},{"top":object.top,"left":object.left});
+                        drawLineAcross({"top":jPerson.top,"left":jPerson.left},{"top":object.top,"left":object.left},0.1,canvas);
                     }
                 });
                 break;
@@ -160,7 +163,7 @@
                 dropdownParent.append("<option id ='"+jPerson.id+"'>"+jPerson.id+"</option>");
                 aFamily.forEach(function(object){
                     if (object.id == jPerson.originid){
-                        drawLineAcross({"top":jPerson.top,"left":jPerson.left},{"top":object.top,"left":object.left});
+                        drawLineAcross({"top":jPerson.top,"left":jPerson.left},{"top":object.top,"left":object.left},0.1,canvas);
                     }
                 });
                 break;
@@ -168,7 +171,7 @@
                 dropdownChild.append("<option id ='"+jPerson.id+"'>"+jPerson.id+"</option>");
                 aFamily.forEach(function(object){
                     if (object.id == jPerson.originid){
-                        drawLineUpwards({"top":jPerson.top,"left":jPerson.left},{"top":object.top,"left":object.left});
+                        drawLineUpwards({"top":jPerson.top,"left":jPerson.left},{"top":object.top,"left":object.left},0.1,canvas);
                     }
                 });
                 break;
@@ -176,7 +179,7 @@
                 dropdownChild.append("<option id ='"+jPerson.id+"'>"+jPerson.id+"</option>");
                 aFamily.forEach(function(object){
                     if (object.id == jPerson.originid){
-                        drawLineUpwards({"top":jPerson.top,"left":jPerson.left},{"top":object.top,"left":object.left});
+                        drawLineUpwards({"top":jPerson.top,"left":jPerson.left},{"top":object.top,"left":object.left},0.1,canvas);
                     }
                 });
                 break;
@@ -217,29 +220,29 @@
         }
     });
 
-    $(".addExistingParent").click(function(){
-        var wrapperElement =  $(this).closest("div .wrapper");
-        var sExistingPersonId = wrapperElement.find($("#selectExistingParent")).val();
-        var oExistingPerson = findObjectInMemory(sExistingPersonId);
-        console.log(oExistingPerson,initiatorObject);
-        drawLineUpwards(initiatorObject,oExistingPerson);
-
-    });
-    $(".addExistingSiblingOrPartner").click(function(){
-        var wrapperElement = $(this).closest("div .wrapper");
-        var sExistingPersonId = wrapperElement.find($("#selectExistingSiblingOrPartner")).val();
-        var oExistingPerson = findObjectInMemory(sExistingPersonId);
-        drawLineAcross(initiatorObject,oExistingPerson);
-
-
-    });
-    $(".addExistingChild").click(function(){
-        var wrapperElement = $(this).closest("div .wrapper");
-        var sExistingPersonId = wrapperElement.find($("#selectExistingChild")).val();
-        var oExistingPerson = findObjectInMemory(sExistingPersonId);
-        drawLineDownwards(initiatorObject,oExistingPerson);
-
-    });
+    // $(".addExistingParent").click(function(){
+    //     var wrapperElement =  $(this).closest("div .wrapper");
+    //     var sExistingPersonId = wrapperElement.find($("#selectExistingParent")).val();
+    //     var oExistingPerson = findObjectInMemory(sExistingPersonId);
+    //     console.log(oExistingPerson,initiatorObject);
+    //     drawLineUpwards(initiatorObject,oExistingPerson,1,canvas);
+    //
+    // });
+    // $(".addExistingSiblingOrPartner").click(function(){
+    //     var wrapperElement = $(this).closest("div .wrapper");
+    //     var sExistingPersonId = wrapperElement.find($("#selectExistingSiblingOrPartner")).val();
+    //     var oExistingPerson = findObjectInMemory(sExistingPersonId);
+    //     drawLineAcross(initiatorObject,oExistingPerson,1,canvas);
+    //
+    //
+    // });
+    // $(".addExistingChild").click(function(){
+    //     var wrapperElement = $(this).closest("div .wrapper");
+    //     var sExistingPersonId = wrapperElement.find($("#selectExistingChild")).val();
+    //     var oExistingPerson = findObjectInMemory(sExistingPersonId);
+    //     drawLineDownwards(initiatorObject,oExistingPerson,1,canvas);
+    //
+    // });
 
     //************************************** FUNCTIONS ********************************************//
     function findObjectInMemory(id){
@@ -304,14 +307,7 @@
         });
         return result;
     }
-    function offsetRow(top,left){
-        aFamily.forEach(function(jPerson){
-            if(jPerson.top == top){
-                jPerson.left+=200;
-                location.reload();
-            }
-        })
-    }
+
     function addParent(originHtml, relation, originObj){
         var originPosition = originHtml.position();
         var parent;
@@ -381,7 +377,7 @@
         const oParent = new Person(offsetPosition.top,offsetPosition.left,img,initiatorObject.id,initiatorObject.gen+1,relation);
         $(parent).css({top:offsetPosition.top, left:offsetPosition.left}).attr("id",oParent.id);
         $(parent).attr("data-originid",initiatorObject.id);
-        drawLineUpwards(originPosition,offsetPosition);
+        drawLineUpwards(originPosition,offsetPosition,1,canvas);
 
         aFamily.push(oParent);
         localStorage.setItem("arrayFamily", JSON.stringify(aFamily));
@@ -415,7 +411,7 @@
         const oPartner = new Person(offsetPosition.top,offsetPosition.left,img,initiatorObject.id,initiatorObject.gen,relation);
         $(partner).css({top:offsetPosition.top, left:offsetPosition.left}).attr("id",oPartner.id);
         $(partner).attr("data-originid",initiatorObject.id);
-        drawLineAcross(originPosition,offsetPosition);
+        drawLineAcross(originPosition,offsetPosition,1,canvas);
         aFamily.push(oPartner);
         localStorage.setItem("arrayFamily", JSON.stringify(aFamily));
     }
@@ -433,13 +429,29 @@
 
         if(originRelativePosition === "left"){
             if(outerElement.first===false){
-                offsetPosition.left = originPosition.left;
+                if(originObj.gen>2){
+                    if(getCoords(offsetPosition.top, originPosition.left+125)){
+                        offsetPosition.left = originPosition.left+125;
+                    }else {
+                        offsetPosition.left = originPosition.left-125;
+                    }
+                }else {
+                    offsetPosition.left = originPosition.left;
+                }
             }else {
                 offsetPosition.left = outerElement.first-250;
             }
         }else {
             if(outerElement.last===false){
-                offsetPosition.left = originPosition.left;
+                if(originObj.gen>2){
+                    if(getCoords(offsetPosition.top, originPosition.left-125)){
+                        offsetPosition.left = originPosition.left-125;
+                    }else {
+                        offsetPosition.left = originPosition.left+125;
+                    }
+                }else {
+                    offsetPosition.left = originPosition.left;
+                }
             }else {
                 offsetPosition.left = outerElement.last+250;
             }
@@ -448,7 +460,7 @@
         $(".canvas-overlay").prepend($(child));
         $(child).css({top:offsetPosition.top, left:offsetPosition.left}).attr("id",oChild.id);
         $(child).attr("data-originid",initiatorObject.id);
-        drawLineDownwards(originPosition,offsetPosition);
+        drawLineDownwards(originPosition,offsetPosition,1,canvas);
         aFamily.push(oChild);
         localStorage.setItem("arrayFamily", JSON.stringify(aFamily));
     }
@@ -487,19 +499,10 @@
         }else {
             return middle;
         }
-
     }
-
-    function shiftFromMiddle(top){
-        var middle = getMiddle();
-        aFamily.forEach(function(jPerson){
-            if(jPerson.left>middle && jPerson.top<=top){
-                jPerson.left = jPerson.left+100;
-            }else if (jPerson.left<middle && jPerson.top<=top){
-                jPerson.left = jPerson.left-100;
-            }
-        });
-        location.reload();
+    function getBottom(){
+        var bottom = ($(".canvas-overlay").height());
+        return bottom;
     }
 
     function getTotalElementsInRow(top){
@@ -518,69 +521,71 @@
         return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
             s4() + '-' + s4() + s4() + s4();
     }
+
     $(".clear-local-storage").on("click",function(){
         localStorage.clear();
         location.reload();
     });
-    $('.element-wrapper').fadeTo(1,0.1);
+
+    $('.element-wrapper').fadeTo(1,0.3);
     $(document).on("mouseenter",".element-wrapper",function(){
+        $('.element-wrapper').fadeTo(1,0.3).css("z-index","1");
         var elementId = this.id;
         var originId = this.dataset.originid;
-        $(this).fadeTo(150,1);
-        $('[data-originid='+elementId+']').fadeTo(1,1);
-        $('#'+originId+'').fadeTo(1,1);
+        $(this).fadeTo(150,1).css("z-index","2");
+        $('[data-originid='+elementId+']').fadeTo(1,1).css("z-index","2");
+        $('#'+originId+'').fadeTo(1,1).css("z-index","2");
         var thisElement = aFamily.filter(function(object){
            return object.id === elementId;
         });
-        console.log(thisElement[0]);
+        // console.log(thisElement[0]);
+
         aFamily.forEach(function(jPerson){
             if(jPerson.originid === elementId){
-                drawLineDownwards(jPerson, thisElement[0],1);
+                if(jPerson.oRelation === "mother" || jPerson.oRelation === "father"){
+                    drawLineDownwards(jPerson, thisElement[0],1, canvasSecondary);
+                }else if(jPerson.oRelation === "son" || jPerson.oRelation === "daughter"){
+                    drawLineDownwards(thisElement[0],jPerson, 1, canvasSecondary);
+                }else if(jPerson.oRelation === "husband" || jPerson.oRelation === "wife"){
+                    drawLineAcross(jPerson,thisElement[0], 1, canvasSecondary)
+                }
+            }
+            if(originId === jPerson.id){
+                if(thisElement[0].oRelation === "son" || thisElement[0].oRelation === "daughter") {
+                    drawLineUpwards(thisElement[0], jPerson, 1, canvasSecondary);
+                }else if(thisElement[0].oRelation === "mother" || thisElement[0].oRelation === "father") {
+                    drawLineDownwards(thisElement[0], jPerson, 1, canvasSecondary);
+                }else if(thisElement[0].oRelation === "husband" || thisElement[0].oRelation === "wife") {
+                    drawLineAcross(thisElement[0],jPerson, 1, canvasSecondary)
 
+                }
             }
         })
     }).on("mouseleave",".element-wrapper",function(){
         var elementId = this.id;
         var originId = this.dataset.originid;
-        $(this).fadeTo(150,0.5);
-        $('[data-originid='+elementId+']').fadeTo(1,0.1);
-        $('#'+originId+'').fadeTo(1,0.1);
+        var ctx = canvasSecondary.getContext('2d');
+        $(this).fadeTo(1,0.3);
+        $('[data-originid='+elementId+']').fadeTo(1,0.3);
+        $('#'+originId+'').fadeTo(1,0.3);
         var thisElement = aFamily.filter(function(object){
             return object.id === elementId;
         });
-        console.log(thisElement[0]);
+        // console.log(thisElement[0]);
         var aOuterDescendants = [];
         aFamily.forEach(function(jPerson){
             if(jPerson.originid === elementId){
                 aOuterDescendants.push(jPerson);
             }
         });
-
-        var lowest = Number.POSITIVE_INFINITY;
-        var lowestHeight;
-        var highest = Number.NEGATIVE_INFINITY;
-        var highestHeight;
-        var tmp;
-        for (var i=aOuterDescendants.length-1; i>=0; i--) {
-            tmp = aOuterDescendants[i].left;
-            if (tmp < lowest){
-                lowest = tmp;
-                lowestHeight = aOuterDescendants[i].top;
-            }
-            if (tmp > highest){
-                highest = tmp;
-                highestHeight = aOuterDescendants[i].top;
-            }
-        }
-        console.log(lowest,highest);
-        ctx.clearRect(lowest, lowestHeight, highest, highestHeight);
+        ctx.clearRect(0,0, canvasSecondary.width, canvasSecondary.height);
     });
 
     /************************************************************* DRAWING FUNCTIONS *******************************************/
-    function drawLineUpwards(origin,destination) {
+    function drawLineUpwards(origin,destination,opacity = 1, targetCanvas) {
 
-        if (canvas.getContext) {
-
+        if (targetCanvas.getContext) {
+            var ctx = targetCanvas.getContext('2d');
             var originObjectCenter = {"left":origin.left+100,"top":origin.top+50};
             var destinationObjectCenter = {"left":destination.left+100,"top":destination.top+50};
 
@@ -589,15 +594,15 @@
             ctx.lineTo(originObjectCenter.left, originObjectCenter.top-75);
             ctx.lineTo(destinationObjectCenter.left, destinationObjectCenter.top+75);
             ctx.lineTo(destinationObjectCenter.left, destinationObjectCenter.top);
-            ctx.strokeStyle = "rgba(0,0,0,0.1)";
+            ctx.strokeStyle = "rgba(0,0,0,"+opacity+")";
             ctx.stroke();
 
         }
     }
-    function drawLineDownwards(origin,destination,opacity = 0.1) {
+    function drawLineDownwards(origin,destination,opacity = 1, targetCanvas) {
 
-        if (canvas.getContext) {
-
+        if (targetCanvas.getContext) {
+            var ctx = targetCanvas.getContext('2d');
             var originObjectCenter = {"left":origin.left+100,"top":origin.top+50};
             var destinationObjectCenter = {"left":destination.left+100,"top":destination.top+50};
 
@@ -611,10 +616,10 @@
         }
     }
 
-    function drawLineAcross(origin,destination) {
+    function drawLineAcross(origin,destination,opacity = 1, targetCanvas) {
 
-        if (canvas.getContext) {
-
+        if (targetCanvas.getContext) {
+            var ctx = targetCanvas.getContext('2d');
             var originObjectCenter = {"left":origin.left+100,"top":origin.top+50};
             var destinationObjectCenter = {"left":destination.left+100,"top":destination.top+50};
 
@@ -623,7 +628,7 @@
             ctx.lineTo(originObjectCenter.left, originObjectCenter.top+75);
             ctx.lineTo(destinationObjectCenter.left, destinationObjectCenter.top+75);
             ctx.lineTo(destinationObjectCenter.left, destinationObjectCenter.top);
-            ctx.strokeStyle = "rgba(0,0,0,0.1)";
+            ctx.strokeStyle = "rgba(0,0,0,"+opacity+")";
             ctx.stroke();
         }
     }

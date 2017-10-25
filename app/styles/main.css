@@ -266,20 +266,7 @@ canvas{
 .element-wrapper div img{
   max-width:135px;
 }
-.grid{
-  width:2400px;
-  height:900px;
-  position:absolute;
-  top:0;
-  z-index:2;
-  display:flex;
-  flex-wrap:wrap;
-}
-.grid-cell{
-  width:300px;
-  height:100px;
-  border: 1px solid black;
-}
+
 .plus{
   position:absolute;
 }
