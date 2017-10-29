@@ -100,7 +100,7 @@
     const Hakan = new Child(40, 30, 20);
     var middleOfCanvas = getMiddle();
     console.log(middleOfCanvas);
-    const familyRoot = new Person(800,middleOfCanvas-100,"me.png",null,1,"origin");
+    const familyRoot = new Person(800,middleOfCanvas-125,"me.png",null,1,"origin");
 
 
 
@@ -124,9 +124,9 @@
 
         aFamily = JSON.parse(sFamily);
     }
-    // var dropdownParent = $("#selectExistingParent");
-    // var dropdownPartner = $("#selectExistingSiblingOrPartner");
-    // var dropdownChild = $("#selectExistingChild");
+    var dropdownParent = $("#selectExistingParent");
+    var dropdownPartner = $("#selectExistingSiblingOrPartner");
+    var dropdownChild = $("#selectExistingChild");
     aFamily.forEach(function(jPerson){
 
         var person = $.parseHTML("<div id='"+jPerson.id+"' class='element-wrapper' data-originid='"+jPerson.originid+"'><button class='plus top'>+</button><button class='plus bottom'>+</button><button class='plus left'>+</button><button class='plus right'>+</button><div><img src='images/"+jPerson.img+"'></div></div>");
@@ -260,7 +260,7 @@
         $(".hide").hide();
         $(".selectParent").show();
         initiatorHtml = $(this).closest(".element-wrapper");
-
+        parentRight = true;
         var id = $(initiatorHtml).attr("id");
         initiatorObject = findObjectInMemory(id);
 
@@ -307,7 +307,11 @@
         });
         return result;
     }
-
+    function createDomElement(img){
+        var element = $.parseHTML("<div class='element-wrapper'><button class='plus top'>+</button><button class='plus bottom'>+</button><button class='plus left'>+</button><button class='plus right'>+</button><div><img src='images/"+img+"'></div></div>");
+        return element;
+    }
+    var parentRight = true;
     function addParent(originHtml, relation, originObj){
         var originPosition = originHtml.position();
         var parent;
@@ -316,62 +320,51 @@
         var img;
         var outerElement = getOuterElement(originPosition.top-150,originObj.id);
         console.log(outerElement);
-        if(relation=="father"){
             img = "father.png";
-            parent = $.parseHTML("<div class='element-wrapper'><button class='plus top'>+</button><button class='plus bottom'>+</button><button class='plus left'>+</button><button class='plus right'>+</button><div><img src='images/"+img+"'></div></div>");
+            parent = createDomElement(img);
 
             switch(originObj.gen) {
                 case 1:
-                    if(outerElement.last===false){
-                        offsetPosition.left = originPosition.left+250;
-                    }else {
-                        offsetPosition.left = outerElement.last+500;
-                    }
-                    break;
-                case 2:
-                    if(outerElement.last===false){
-                        offsetPosition.left = originPosition.left+125;
-                    }else {
-                        offsetPosition.left = outerElement.last+250;
-                    }
-                    break;
-                default:
-                    if(outerElement.last===false){
-                        offsetPosition.left = originPosition.left+125;
-                    }else {
-                        offsetPosition.left = outerElement.last+250;
-                    }
-                    break;
-            }
-        }else {
-            img = "mother.png";
-            parent = $.parseHTML("<div class='element-wrapper'><button class='plus top'>+</button><button class='plus bottom'>+</button><button class='plus left'>+</button><button class='plus right'>+</button><div><img src='images/"+img+"'></div></div>");
-            switch(originObj.gen) {
-                case 1:
-                    if(outerElement.first===false){
-                        offsetPosition.left = originPosition.left-250;
+                    if(parentRight === true){
+                        if(outerElement.last===false){
+                            offsetPosition.left = originPosition.left+250;
 
+                        }else {
+                            offsetPosition.left = outerElement.last+500;
+                        }
+                        parentRight = false;
                     }else {
-                        offsetPosition.left = outerElement.first-500;
+                        if(outerElement.first===false){
+                            offsetPosition.left = originPosition.left-250;
+
+                        }else {
+                            offsetPosition.left = outerElement.first-500;
+                        }
+                        parentRight = true;
                     }
+
                     break;
-                case 2:
-                    if(outerElement.first===false){
-                        offsetPosition.left = originPosition.left-125;
+                default :
+                    if(parentRight === true){
+                        if(outerElement.last===false){
+                            offsetPosition.left = originPosition.left+125;
+
+                        }else {
+                            offsetPosition.left = outerElement.last+250;
+                        }
+                        parentRight = false;
                     }else {
-                        offsetPosition.left = outerElement.first-250;
-                    }
-                    break;
-                default:
-                    if(outerElement.first===false){
-                        offsetPosition.left = originPosition.left-125;
-                    }else {
-                        offsetPosition.left = outerElement.first-250;
+                        if(outerElement.first===false){
+                            offsetPosition.left = originPosition.left-125;
+
+                        }else {
+                            offsetPosition.left = outerElement.first-250;
+                        }
+                        parentRight = true;
                     }
                     break;
             }
 
-        }
         $(".canvas-overlay").prepend($(parent));
 
         const oParent = new Person(offsetPosition.top,offsetPosition.left,img,initiatorObject.id,initiatorObject.gen+1,relation);
@@ -586,8 +579,8 @@
 
         if (targetCanvas.getContext) {
             var ctx = targetCanvas.getContext('2d');
-            var originObjectCenter = {"left":origin.left+100,"top":origin.top+50};
-            var destinationObjectCenter = {"left":destination.left+100,"top":destination.top+50};
+            var originObjectCenter = {"left":origin.left+125,"top":origin.top+50};
+            var destinationObjectCenter = {"left":destination.left+125,"top":destination.top+50};
 
             ctx.beginPath();
             ctx.moveTo(originObjectCenter.left, originObjectCenter.top);
@@ -603,8 +596,8 @@
 
         if (targetCanvas.getContext) {
             var ctx = targetCanvas.getContext('2d');
-            var originObjectCenter = {"left":origin.left+100,"top":origin.top+50};
-            var destinationObjectCenter = {"left":destination.left+100,"top":destination.top+50};
+            var originObjectCenter = {"left":origin.left+125,"top":origin.top+50};
+            var destinationObjectCenter = {"left":destination.left+125,"top":destination.top+50};
 
             ctx.beginPath();
             ctx.moveTo(originObjectCenter.left, originObjectCenter.top);
@@ -620,8 +613,8 @@
 
         if (targetCanvas.getContext) {
             var ctx = targetCanvas.getContext('2d');
-            var originObjectCenter = {"left":origin.left+100,"top":origin.top+50};
-            var destinationObjectCenter = {"left":destination.left+100,"top":destination.top+50};
+            var originObjectCenter = {"left":origin.left+125,"top":origin.top+50};
+            var destinationObjectCenter = {"left":destination.left+125,"top":destination.top+50};
 
             ctx.beginPath();
             ctx.moveTo(originObjectCenter.left, originObjectCenter.top);
